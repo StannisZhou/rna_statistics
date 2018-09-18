@@ -1,0 +1,17 @@
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.7\textwidth]{bound_unbound.png}
+\vglue 0.5cm
+
+\caption{{\bf Bound or Unbound?} ROC performance of classifiers based on thresholding T-S
+and D-S ambiguity indexes. Small values are taken as evidence for molecules that are active as
+single entities (unbound), as opposed to parts of ribonucleoproteins (bound). Classifiers in the
+left two panels use comparative secondary structures to compute ambiguity indexes; those on the
+right use (approximate) minimum free energies. In each of the four experiments, a conditional
+p-value was also calculated, based only on the signs of the indexes and the null hypothesis that
+positive indexes are distributed randomly among molecules of all types as opposed to the alternative
+that positive indexes are more typically found among families of bound RNA. Under the null hypothesis,
+the test statistic is hypergeometric---see Eq \ref{eqn:null}. {\em Upper Left:} $p= 1.2 \times 10^{-34} $;
+{\em Lower Left:} $p=7.3 \times 10^{-8}$; {\em Upper Right:} $p=0.02$;  {\em Lower Right:} $p=0.92$.}
+\label{fig:UnboundVSBound}
+\end{figure}
