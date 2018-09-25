@@ -106,11 +106,23 @@ def get_markov_shuffles(rna_molecules, parallel=True):
     for group in rna_molecules:
         markov_shuffles[group] = {}
         for fname in tqdm(rna_molecules[group]):
+            markov_shuffles[group][fname] = {}
             molecule = rna_molecules[group][fname]
             shuffles = rna.get_markov_shuffles(
                 molecule.primary_structure, molecule.case, molecule.K, molecule.r, parallel
             )
-            markov_shuffles[group][fname] = shuffles
+            flag = True
+            for key in ['comparative', 'mfe']:
+                for index in ['T-S', 'D-S']:
+                    alpha_index = molecule.get_alpha_index(key, index, shuffles)
+                    if np.isnan(alpha_index):
+                        flag = False
+
+                    markov_shuffles[group][fname][
+                        'alpha_index_{}_{}'.format(key, index)
+                    ] = alpha_index
+
+            markov_shuffles[group][fname]['flag'] = flag
 
     return markov_shuffles
 
@@ -121,13 +133,10 @@ def get_essential_data(rna_molecules, markov_shuffles):
         essential_data[group] = {}
         for fname in tqdm(rna_molecules[group]):
             molecule = rna_molecules[group][fname]
-            if markov_shuffles:
-                shuffles = markov_shuffles[group][fname]
-
             results = {
                 'length': len(molecule.primary_structure)
             }
-            flag = True
+            flag = markov_shuffles[group][fname]['flag']
             for key in ['comparative', 'mfe']:
                 for index in ['T-S', 'D-S']:
                     ambiguity_index = molecule.get_ambiguity_index(key, index)
@@ -137,14 +146,11 @@ def get_essential_data(rna_molecules, markov_shuffles):
                     results[
                         'ambiguity_index_{}_{}'.format(key, index)
                     ] = ambiguity_index
-                    if markov_shuffles:
-                        alpha_index = molecule.get_alpha_index(key, index, shuffles)
-                        if np.isnan(alpha_index):
-                            flag = False
-
-                        results[
-                            'alpha_index_{}_{}'.format(key, index)
-                        ] = alpha_index
+                    results[
+                        'alpha_index_{}_{}'.format(key, index)
+                    ] = markov_shuffles[group][fname][
+                        'alpha_index_{}_{}'.format(key, index)
+                    ]
 
             if flag:
                 essential_data[group][fname] = results

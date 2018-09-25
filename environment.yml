@@ -1,0 +1,17 @@
+name: rna_statistics
+channels:
+  - defaults
+dependencies:
+  - cython
+  - h5py
+  - matplotlib
+  - numpy
+  - pandas
+  - python=3.6.6
+  - scipy
+  - tqdm
+  - pip:
+    - multiprocess
+    - scikit-learn
+    - sklearn
+    - ushuffle

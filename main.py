@@ -6,7 +6,7 @@ import data
 import results
 
 
-K, r = 5, 4
+K, r = 10000, 4
 data_folder = os.path.abspath('data')
 raw_data_fname = 'intermediate/raw_data.pkl'
 processed_data_fname = 'intermediate/rna_molecules.pkl'
@@ -30,16 +30,15 @@ else:
     with open(processed_data_fname, 'rb') as f:
         rna_molecules = pickle.load(f)
 
-#  if not os.path.exists(markov_shuffles_fname):
-    #  markov_shuffles = data.get_markov_shuffles(rna_molecules, False)
-    #  import pdb; pdb.set_trace()
-    #  with open(markov_shuffles_fname, 'wb') as f:
-        #  pickle.dump(markov_shuffles, f)
-#  else:
-    #  with open(markov_shuffles_fname, 'rb') as f:
-        #  markov_shuffles = pickle.load(f)
+if not os.path.exists(markov_shuffles_fname):
+    markov_shuffles = data.get_markov_shuffles(rna_molecules)
+    with open(markov_shuffles_fname, 'wb') as f:
+        pickle.dump(markov_shuffles, f)
+else:
+    with open(markov_shuffles_fname, 'rb') as f:
+        markov_shuffles = pickle.load(f)
 
-essential_data = data.get_essential_data(rna_molecules, markov_shuffles=None)
+essential_data = data.get_essential_data(rna_molecules, markov_shuffles)
 essential_data_by_family = results.get_essential_data_by_family(essential_data)
 
 exploratory_comparative_fname = 'exploratory_comparative.tex'
@@ -51,9 +50,9 @@ comparative_mfe_tex_fname = 'comparative_mfe.tex'
 formal_analysis_fname = 'formal_analysis.tex'
 data_summary_fname = 'data_summary.tex'
 
-#  results.generate_exploratory_analysis_tables(
-    #  essential_data_by_family, exploratory_comparative_fname, exploratory_mfe_fname
-#  )
+results.generate_exploratory_analysis_tables(
+    essential_data_by_family, exploratory_comparative_fname, exploratory_mfe_fname
+)
 results.generate_formal_analysis_table(
     essential_data_by_family, formal_analysis_fname
 )

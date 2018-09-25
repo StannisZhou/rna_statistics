@@ -36,16 +36,16 @@ def get_essential_data_by_family(essential_data):
                 'D-S': np.zeros(n_molecules)
             }
         }
-        #  alpha_index = {
-            #  'comparative': {
-                #  'T-S': np.zeros(n_molecules),
-                #  'D-S': np.zeros(n_molecules)
-            #  },
-            #  'mfe': {
-                #  'T-S': np.zeros(n_molecules),
-                #  'D-S': np.zeros(n_molecules)
-            #  }
-        #  }
+        alpha_index = {
+            'comparative': {
+                'T-S': np.zeros(n_molecules),
+                'D-S': np.zeros(n_molecules)
+            },
+            'mfe': {
+                'T-S': np.zeros(n_molecules),
+                'D-S': np.zeros(n_molecules)
+            }
+        }
         for ff, fname in enumerate(essential_data[group]):
             molecule_lengths[ff] = essential_data[group][fname]['length']
             for key in ['comparative', 'mfe']:
@@ -53,15 +53,15 @@ def get_essential_data_by_family(essential_data):
                     ambiguity_index[key][index][ff] = essential_data[group][fname][
                         'ambiguity_index_{}_{}'.format(key, index)
                     ]
-                    #  alpha_index[key][index][ff] = essential_data[group][fname][
-                        #  'alpha_index_{}_{}'.format(key, index)
-                    #  ]
+                    alpha_index[key][index][ff] = essential_data[group][fname][
+                        'alpha_index_{}_{}'.format(key, index)
+                    ]
 
         essential_data_by_family[group] = {
             'n_molecules': n_molecules,
             'molecule_lengths': molecule_lengths,
             'ambiguity_index': ambiguity_index,
-            #  'alpha_index': alpha_index
+            'alpha_index': alpha_index
         }
 
     return essential_data_by_family
@@ -71,9 +71,9 @@ def generate_exploratory_analysis_tables(essential_data_by_family, comparative_f
     with open(os.path.join('paper', comparative_fname), 'w') as f:
         for group in rna.RNA_GROUPS:
             data = essential_data_by_family[group]
-            f.write(' {} & {} & {} & {} & {} \\\\ \\hline\n'.format(
+            f.write(' {} & {} & {} & {:.3f} & {:.3f} \\\\ \\hline\n'.format(
                 GROUP_NAMES[group], data['n_molecules'],
-                np.median(data['molecule_lengths']),
+                int(np.median(data['molecule_lengths'])),
                 np.median(data['alpha_index']['comparative']['T-S']),
                 np.median(data['alpha_index']['comparative']['D-S'])
             ))
@@ -81,9 +81,9 @@ def generate_exploratory_analysis_tables(essential_data_by_family, comparative_f
     with open(os.path.join('paper', mfe_fname), 'w') as f:
         for group in rna.RNA_GROUPS:
             data = essential_data_by_family[group]
-            f.write(' {} & {} & {} & {} & {} \\\\ \\hline\n'.format(
+            f.write(' {} & {} & {} & {:.3f} & {:.3f} \\\\ \\hline\n'.format(
                 GROUP_NAMES[group], data['n_molecules'],
-                np.median(data['molecule_lengths']),
+                int(np.median(data['molecule_lengths'])),
                 np.median(data['alpha_index']['mfe']['T-S']),
                 np.median(data['alpha_index']['mfe']['D-S'])
             ))
