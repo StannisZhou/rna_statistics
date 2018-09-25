@@ -16,6 +16,8 @@ conda env create -f environment.yml
 source activate rna_statistics
 ```
 
+3. Install the [Vienna RNA package](https://www.tbi.univie.ac.at/RNA/). Make sure `RNAfold` is available at the commandline.
+
 # Reproduce the results
 
 Use
