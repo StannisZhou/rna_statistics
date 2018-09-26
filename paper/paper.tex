@@ -19,7 +19,8 @@
 \usepackage{cite}
 
 % Use nameref to cite supporting information files (see Supporting Information section for more info)
-\usepackage{nameref,hyperref}
+\usepackage{nameref}
+\usepackage[colorlinks = true, urlcolor = blue]{hyperref}
 
 % line numbers
 \usepackage[right]{lineno}
@@ -333,7 +334,7 @@ Let $\mathcal E(p)$ be the set of all permutations of the ordering of nucleotide
 \[
 {\cal E}(p) = \{p': {\cal H}(p')={\cal H}(p)\}
 \]
-Clever algorithms exist for efficiently drawing independent samples from the uniform distribution on $\mathcal{E}$---see [xxx] and [yyy]. Let $p^{(1)},
+Clever algorithms exist for efficiently drawing independent samples from the uniform distribution on $\mathcal{E}$---see \cite{Kandel1996-kz, Fitch1983-ec, Altschul1985-nq}. Let $p^{(1)},
 \ldots,p^{(K)}$ be $K$ such samples, and let $\displaystyle
 d_\text{T-S}\big(p^{(1)},s\big),\ldots,d_\text{T-S}\big(p^{(K)},s\big)$ and
 $\displaystyle
@@ -518,15 +519,7 @@ The same experiments, with the same conclusions, were also performed using the D
 \section*{Materials and Methods}
 \subsection*{Datasets}
 
-In this paper, we used secondary structures data from comparative analysis for 4 different kinds of RNA molecules: Group I Introns and Group II Introns, from the comparative RNA website  \cite{Cannone2002-tp}, SRP RNAs from SRPDB (Signal Recognition Particle Database)  \cite{Andersen2006-uh}, and tmRNAs from tmRDB (tmRNA database)  \cite{Andersen2006-uh}. Refer to the corresponding papers and the websites for more details on how the comparative analysis was done.
-
-To get the Group I Introns and Group II Introns comparative analysis secondary structures data, go to Section 3C (Mass Data Retrieval, \url{http://www.rna.icmb.utexas.edu/DAT/3C/Structure/index.php}) of the website, and download all the secondary structures data (in bpseq format) for Group I Introns and Group II Introns.
-
-To get the SRP RNAs comparative analysis secondary structures data, go to the SRP RNA page (\url{https://rth.dk/resources/rnp/SRPDB/srprna.html}) of the SRPDB website, and select get all SRP RNA secondary structures.
-
-To get the tmRNAs comparative analysis secondary structures data, go to the tmRNA page (\url{http://www.ag.auburn.edu/mirror/tmRDB/rna/tmrna.html}) of the tmRDB website, and select get all ct files.
-
-Table \ref{table:lengths} contains information about the numbers and lengths (measured in nucleotides) of the RNA molecules in each of the six groups studied. 
+In this paper, we obtained comparative analysis secondary structures data for seven different families of RNA molecules from the RNA STRAND database\cite{Andronescu2008-rj}, a curated collection of RNA secondary structures. These families include: Group I Introns and Group II Introns\cite{Cannone2002-tp}, tmRNAs and SRP RNAs\cite{Andersen2006-uh}, the Ribonuclease P RNAs\cite{Brown1999-co}, and 16s rRNAs and 23s rRNAs\cite{Cannone2002-tp}. Table \ref{table:lengths} contains information about the numbers and lengths (measured in nucleotides) of the RNA molecules in each of the seven groups studied. Note that we excluded families like tRNAs, 5s rRNAs and hammerhead ribozymes since most of the molecules in these families are too short to be interesting for our purpose. Also, since we are focusing on comparative analysis secondary structures, we excluded any secondary structures derived using x-ray crystallography or NMR.
 
 \vglue .1cm
 \begin{table}[h!]
@@ -536,19 +529,24 @@ Table \ref{table:lengths} contains information about the numbers and lengths (me
 \input{data_summary.tex}
 \end{tabular}
 \vglue .5cm
-\caption{\footnotesize {\bf Data Summary.} The six families of RNA used in the experiments. Table includes the number of molecules in each family, as well as basic statistics about the numbers of nucleotides in the primary sequence of each of the molecules. Data was downloaded from the open-source repository xxx yyy zzz stuff...}
+\caption{\footnotesize {\bf Data Summary.} The seven families of RNA used in the experiments. Table includes the number of molecules in each family, as well as basic statistics about the numbers of nucleotides in the primary sequence of each of the molecules. Data was downloaded from the \href{http://www.rnasoft.ca/strand/}{RNA STRAND database}.}
 \label{table:lengths}
 \end{center}
 \end{table}
 
 
-\subsection*{Markov Shuffling}
+\subsection*{Minimum Free Energy Methods}
 
-Randomly shuffled sequences are routinely used in sequence analysis to evaluate the statistical significance of a biological sequence. In this paper, we are using what we call a Markov shuffling method, which is based on the Euler Algorithm  \cite{Kandel1996-kz, Fitch1983-ec, Altschul1985-nq}. The basic idea is to generate uniform random $k$-let-preserving sequences. In this paper, we used an efficient and flexible implementation of the Euler algorithm, called uShuffle  \cite{Jiang2008-yj}. Refer to the papers for more details on the Euler algorithm and the implementation details.
+Exact dynamic programming algorithms based on carefully measured thermodynamic parameters are still the prevalent methods for RNA secondary structures prediction. There exist a large number of software packages for the energy minization \cite{Lorenz2011-eb, Markham2008-ku, Reuter2010-bw, Zadeh2011-eu, Hamada2009-yf, Ding2003-sv, Reeder2009-xl}. In this paper, we used the \href{https://www.tbi.univie.ac.at/RNA/}{ViennaRNA package} \cite{Lorenz2011-eb} to obtain the MFE secondary structures for our statistical analysis.
 
-\subsection*{Minimum Free Energy Methods for Secondary Structure Prediction}
-
-Exact dynamic programming algorithms based on carefully measured thermodynamic parameters are still the prevalent methods for RNA secondary structures prediction. There exist a large number of software packages for the energy minization process  \cite{Lorenz2011-eb, Markham2008-ku, Reuter2010-bw, Zadeh2011-eu, Hamada2009-yf, Ding2003-sv, Reeder2009-xl}. In this paper, we used the ViennaRNA package  \cite{Lorenz2011-eb} to obtain the minimum free energy secondary structures for our statistical analysis. Refer to the paper and their website (\url{https://www.tbi.univie.ac.at/RNA/}) for more details on this package.
+\subsection*{Reproducing the Results}
+The results presented in this paper can be easily reproduced. Follow the intrustions on \url{https://github.com/StannisZhou/rna_statistics}. Here we make a few comments regarding some implementation details.
+\begin{itemize}
+	\item In the process of obtaining the data, we used the \textit{bpseq} format, and excluded structures derived from x-ray crystallography or NMR structures, as well as structures for duplicate sequences. Concretely, this means picking a particular type, and select \textit{No} for \textit{Validated by NMR or X-Ray} and \textit{Non-redundant sequences only} for \textit{Duplicates} on the \href{http://www.rnasoft.ca/strand/search.php}{search page} of the RNA STRAND database. A copy of the data we used is included in the \href{https://github.com/StannisZhou/rna_statistics/tree/master/data}{GitHub repository}, but the readers should feel free to try out the analysis on other data.
+	\item When processing the data, we ignored molecules for which we have nucleotides other than \textit{A, G, C, U}, and molecules for which we don't have any base pairs.
+	\item When comparing the local ambiguities in different regions of the RNA molecules, we ignored molecules for which we have empty regions (i.e. at least one of \textit{single, double} and \textit{transitional} is empty), as well as molecules where all local ambiguities in \textit{single} or \textit{double} are 0.
+	\item For shuffling the molecules, we used an efficient and flexible implementation of the Euler algorithm\cite{Kandel1996-kz, Fitch1983-ec, Altschul1985-nq}, called uShuffle \cite{Jiang2008-yj}, which is conveniently available as a \href{https://github.com/guma44/ushuffle}{python package}.
+\end{itemize}
 
 \section*{Acknowledgments}
 
