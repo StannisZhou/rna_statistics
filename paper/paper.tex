@@ -269,9 +269,9 @@ Finally, we use $f$ to distinguish three types of locations (and hence three typ
 \end{equation}
 
 \subsection*{A First Look at the Data: Shuffling Nucleotides}
-Our goal is to explore connections between ambiguities and basic characteristics of RNA families, as well as the changes in these relationships, if any, when using comparative, as opposed to MFE, secondary structures.
+Our goals are to explore connections between ambiguities and basic characteristics of RNA families, as well as the changes in these relationships, if any, when using comparative, as opposed to MFE, secondary structures.
 For each molecule and each location $i$, the segment at $i$ has been assigned a ``local ambiguity'' $a_i(p)$ that depends only on the primary structure, and a label ({\it single}, {\it double}, or {\it transitional}) that depends only on the secondary structure. Since the local ambiguity, by itself, is strongly dependent on the length of the molecule, and possibly on other intrinsic properties,
-we proposed two {\em relative} ambiguity indexes: T-S and D-S, each of which depends on both the primary ($p$) and purported secondary ($s$) structures. Formally,
+we propose two {\em relative} ambiguity indexes: T-S and D-S, each of which depends on both the primary ($p$) and purported secondary ($s$) structures. Formally,
 \begin{equation}
 	d_\text{T-S}(p, s) = \frac
 	{\sum_{j = 0}^{N - 3} a_j (p) 
@@ -283,7 +283,7 @@ we proposed two {\em relative} ambiguity indexes: T-S and D-S, each of which dep
 	{\sum_{j = 0}^{N - 3} c_j^{\text{single}} (s)}
 \end{equation}
 where we have used
-$c_i^{\text{double}}$ and $c_i^{\text{single}}$ for indicating whether location $i$ is {\it transitional} or {\it single} respectively. In other words, for each $i=1,2,\ldots,N-3$
+$c_i^{\text{tran}}$ and $c_i^{\text{single}}$ for indicating whether location $i$ is {\it transitional} or {\it single} respectively. In other words, for each $i=1,2,\ldots,N-3$
 \begin{align}
 	c_i^{\text{tran}} &=
 	\begin{cases}
@@ -297,7 +297,8 @@ $c_i^{\text{double}}$ and $c_i^{\text{single}}$ for indicating whether location 
 	\end{cases}
 \end{align}
 In short, the T-S ambiguity index is the difference in the averages of the local ambiguities at {\em transitional} sites and {\em single} sites.
-Since, as noted earlier, the local ambiguity at every {\em double} location, $i$, is at least one ($a_i\geq 1$), the D-S index involves only those {\em single} locations, $j$, for which it is also the case that $a_j\geq 1$:
+Since, as noted earlier, the local ambiguity at every {\em double} location, $i$, 
+is likely to be at least one ($a_i\geq 1$), the D-S index involves only those {\em single} locations, $j$, for which $a_j\geq 1$:
 \begin{equation}
 	d_\text{D-S}(p, s) = \frac
 	{\sum_{j = 0}^{N - 3} a_j (p) 
@@ -308,7 +309,8 @@ Since, as noted earlier, the local ambiguity at every {\em double} location, $i$
 	{\sum_{j = 0}^{N - 3} a_j (p) \hat{c}_j^{\text{single}} (p,s)}
 	{\sum_{j = 0}^{N - 3} \hat{c}_j^{\text{single}} (p,s)}
 \end{equation}
-Here, $\hat{c}^{\text{single}}$, which evidently depends on both primary and secondary structure, indicates those {\em single} locations with at least one pair: for each $i=1,2,\ldots,N-3$
+Here, $c_i^{\text{double}}=1$ if $i$ is {\em double}, and zero otherwise, and
+$\hat{c}^{\text{single}}_i$ indicates those {\em single} locations with at least one pair: for each $i=1,2,\ldots,N-3$,
 \begin{align}
 	\hat{c}_i^{\text{single}} & =
 	\begin{cases}
@@ -316,6 +318,8 @@ Here, $\hat{c}^{\text{single}}$, which evidently depends on both primary and sec
 		0, & \text{otherwise}
 	\end{cases}
 \end{align}
+Note that $\hat{c}^{\text{single}}_i$ depends on both primary and secondary structures: 
+$\hat{c}^{\text{single}}_i$ $=$ $\hat{c}^{\text{single}}_i(p,s)$.
 
 Thinking kinetically, we might expect to find relatively small values of the T-S and D-S indexes
 ($d_\text{T-S}$ and $d_\text{D-S}$)
@@ -323,19 +327,20 @@ in RNA families which fold and operate as individual entities---what we call her
 is that larger numbers of partial matches for a given sequence in or around a stem would likely interfere with the {\em nucleation} of the native stem structure, potentially disrupting folding, and nucleation appears to be a critical and perhaps even rate-limiting step in folding. 
 Indeed, the experimental literature  \cite{Porschke1974-hn, Porschke1974-nr, Porschke1977-xz, Mohan2009-gt} has long suggested that stem formation in RNA molecules is a two-step process. When forming a stem, there is usually a slow nucleation step, resulting in a few consecutive base pairs at a nucleation point, followed by a fast zipping step. 
 Since the ambiguity indexes are functions of the secondary structure, $s$, 
-our expectation are made, implicitly, under the assumption that $s$ is correct. For the time being we will focus only on comparative structures, returning later to the questions about MFE structures raised in the {\em Introduction}. 
+our expectations are made, implicitly, under the assumption that $s$ is correct. For the time being we will focus only on comparative structures, returning later to the questions about MFE structures raised in the {\em Introduction}. 
 
 How are
 we to gauge $d_\text{T-S}$ and $d_\text{D-S}$, and how are we to compare their values across different RNA families? 
 Consider the following experiment: for a given RNA molecule we create a ``surrogate'' which has the same nucleotides, and in fact the same counts of {\em all} four-tuple segments as the original molecule, but is otherwise ordered randomly. If ACCU appeared eight times in the original molecule, then it appears eight times in the surrogate, and the same can be said of all sequences of four successive nucleotides---the frequency of each of the $4^4$ possible segments is preserved in the surrogate.  If we also preserve the locations of the {\it transitional}, {\it double}, and {\it single} labels, then we can compute new values for $d_\text{T-S}$ and $d_\text{D-S}$,
-say  $\tilde{d}_\text{T-S}$ and $\tilde{d}_\text{D-S}$, from the surrogate. If we produce many surrogate sequences then we will get a distribution of  
+say  $\tilde{d}_\text{T-S}$ and $\tilde{d}_\text{D-S}$, from the surrogate. If we produce many surrogate sequences then we will get a sampling of  
 surrogate values $\tilde{d}$, one for each of the two ambiguity indexes, to which we can compare $d$. We made several experiments of this type---for each of the two indexes, T-S and D-S, within each of the seven RNA families (Group I and Group II Introns, tmRNA, SRP RNA, RNase P, and 16s and 23s rRNA).
 
 To make this precise, consider an RNA molecule with primary structure $p$ and comparative secondary structure $s$. Construct a segment ``histogram function,'' $\mathcal{H}(p)$, which is the 
 vector of the number of times that each of the $4^4$ possible segments appears in $p$.\footnote{${\cal H}$ is made a vector by fixing an arbitrary ordering of all possible segments.}.
-Let $\mathcal E(p)$ be the set of all permutations of the ordering of nucleotides in $p$ that preserve the frequencies of four-tuples:
+Let $\mathcal{P}(p)$ be the set of all permutations of the ordering of nucleotides in $p$, and let 
+$\mathcal{E}(p)\subseteq\mathcal{P}(p)$ be the subset of permutations that preserve the frequencies of four-tuples:
 \[
-{\cal E}(p) = \{p': {\cal H}(p')={\cal H}(p)\}
+{\cal E}(p) = \{p'\in\mathcal{P}(p): {\cal H}(p')={\cal H}(p)\}
 \]
 Clever algorithms exist for efficiently drawing independent samples from the uniform distribution on $\mathcal{E}$---see \cite{Kandel1996-kz, Fitch1983-ec, Altschul1985-nq}. Let $p^{(1)},
 \ldots,p^{(K)}$ be $K$ such samples, and let $\displaystyle
@@ -364,12 +369,12 @@ $d_\text{T-S}(p,s)$, respectively:
 In essence, each $\alpha$ score is a self-calibrated ambiguity index.
 
 It is tempting to interpret $\alpha_\text{T-S}(p,s)$ as a p-value from a conditional hypothesis test: Given $s$ and $\mathcal{H}$, test the null hypothesis that $d_\text{T-S}(p,s)$ is statistically indistinguishable from  
-$d_\text{T-S}(p^\prime,s)$, where $p^\prime$ is a random sample from $\mathcal{E}$. If the alternative hypothesis were that $d_\text{T-S}(p^\prime,s)$ is too small to be consistent with the null,  then the null is rejected in favor of the alternative with probability $\alpha_\text{T-S}(p,s)$. The problem with this interpretation, and the analogous one for $\alpha_\text{D-S}(p,s)$, is that this null hypothesis violates the simple observation that given $\mathcal{H}$ there is information in $s$ about $p$, whereas  $p^{(1)},\ldots,p^{(K)}$ are independent of $s$ given $\mathcal{H}$. A larger problem is that there is no reason to believe the alternative; we are more interested in {\em relative} than absolute ambiguity indexes. Thinking of  
-$\alpha_\text{T-S}(p,s)$ and $\alpha_\text{D-S}(p,s)$ as a calibrated, intra-molecular indexes, we want to know how they vary across RNA families, and whether these variations depend on the differences between comparative and MFE structures.
+$d_\text{T-S}(p^\prime,s)$, where $p^\prime$ is a random sample from $\mathcal{E}$. If the alternative hypothesis were that $d_\text{T-S}(p,s)$ is too small to be consistent with the null,  then the null is rejected in favor of the alternative with probability $\alpha_\text{T-S}(p,s)$. The problem with this interpretation, and the analogous one for $\alpha_\text{D-S}(p,s)$, is that this null hypothesis violates the simple observation that given $\mathcal{H}$ there is information in $s$ about $p$, whereas  $p^{(1)},\ldots,p^{(K)}$ are independent of $s$ given $\mathcal{H}$. A larger problem is that there is no reason to believe the alternative; we are more interested in {\em relative} than absolute ambiguity indexes. Thinking of  
+$\alpha_\text{T-S}(p,s)$ and $\alpha_\text{D-S}(p,s)$ as calibrated intra-molecular indexes, we want to know how they vary across RNA families, and whether these variations depend on the differences between comparative and MFE structures.
 
 Nevertheless, $\alpha_\text{T-S}(p,s)$ and $\alpha_\text{D-S}(p,s)$ are useful statistics for exploratory analysis.  Table \ref{table:explore_comp} provides summary data about the $\alpha$ scores for each of the seven RNA families. 
 For each molecule in each family we use the primary structure and the comparative secondary structure, and $K=$10,000 samples from $\mathcal{E}$, to compute
-individual T-S and D-S$\alpha$ scores (Eqs \ref{eqn:alpha_T-S} and \ref{eqn:alpha_D-S}). Keeping in mind that a smaller value of $\alpha$ represents a smaller {\em calibrated} value of the corresponding ambiguity index, $d(p,s)$, there is evidently a disparity between ambiguity indexes of RNA molecules that form ribonucleoproteins and those of RNA that are already active as individual molecules. As a group, the unbound molecules have systematically lower ambiguity indexes. As already noted, this observation is consistent with, and in fact anticipated by, the kinetic point of view. Shortly, we will support this observation with ROC curves and rigorous hypothesis tests.
+individual T-S and D-S $\alpha$ scores (Eqs \ref{eqn:alpha_T-S} and \ref{eqn:alpha_D-S}). Keeping in mind that a smaller value of $\alpha$ represents a smaller {\em calibrated} value of the corresponding ambiguity index, $d(p,s)$, there is evidently a disparity between ambiguity indexes of RNA molecules that form ribonucleoproteins and those of RNA that are already active as individual molecules. As a group, the unbound molecules have systematically lower ambiguity indexes. As already noted, this observation is consistent with, and in fact anticipated by, the kinetic point of view. Shortly, we will support this observation with ROC curves and rigorous hypothesis tests.
 
 \vglue .1cm
 \begin{table}[h!]
@@ -407,7 +412,7 @@ $\bm{\alpha_\text{\bf T-S}}$ &  $\bm \alpha_\text{\bf D-S}$
 \input{exploratory_mfe.tex}
 \end{tabular}
 \vglue .5cm
-\caption{\footnotesize {\bf MFE Secondary Structures: calibrated ambiguity indexes, by RNA family.} Identical to Table \ref{table:explore_comp}, except that the ambiguity indexes and their calibrations are calculated using the MFE secondary structures rather than those derived from comparison analyses. There is little evidence in the MFE secondary structures for lower ambiguity indexes among unbound RNA molecules.}
+\caption{\footnotesize {\bf MFE Secondary Structures: calibrated ambiguity indexes, by RNA family.} Identical to Table \ref{table:explore_comp}, except that the ambiguity indexes and their calibrations are calculated using the MFE secondary structures rather than comparative analyses. There is little evidence in the MFE secondary structures for lower ambiguity indexes among unbound RNA molecules.}
 \label{table:explore_MFE}
 \end{center}
 \end{table}
