@@ -241,10 +241,10 @@ a(p) = (a_1(p), \cdots, a_{N - 3}(p))
 which is a vector-valued function of the primary structure $p$. The vector has  one component, $a_i(p)$, for each segment $P_i$, which is, simply, the number of feasible segments that are complementary to $P_i$:
 \begin{align}
  a_i (p)& =  \# \{ P \in A_i : P \text{ and }P_i \text{ are complementary} \}  
- \\
+ \label{eqn:LocalAmbiguity} \\
 & = 
 \#\big\{P_j\in A_i:  (P_{i, k}, P_{j, 5 - k}) \in \{ (A, U), (U, A), (G, C), (C, G), (G,U), (U,G) \},
-\nonumber \\
+\nonumber  \\
 &  \ \ \ \ \ \ \ \ k=1,\ldots,4 \big\} 
 \nonumber 
 \end{align}
@@ -252,7 +252,7 @@ which is a vector-valued function of the primary structure $p$. The vector has  
 We want to explore the relationship between ambiguity and secondary structure. 
 We can do this conveniently, on a molecule-by-molecule basis, by introducing another vector-valued function, this time depending only on a purported secondary structure.  Specifically, the new function assigns a descriptive label to each location (i.e. each nucleotide), determined by whether the segment at the given location is fully paired, partially paired, or fully unpaired. 
 
-Formally, given a secondary structure $s$, as defined in equation (2), and a location $i\in\{1, 2,\ldots,N-3\}$, let $f_i(s)$ be the number of nucleotides in $P_i$ that are paired under $s$:
+Formally, given a secondary structure $s$, as defined in Eq (2), and a location $i\in\{1, 2,\ldots,N-3\}$, let $f_i(s)$ be the number of nucleotides in $P_i$ that are paired under $s$:
 \begin{equation}
 f_i(s) = \#\{j\in P_i:(j,k)\in s\text{ or } (k,j)\in s, \text{ for some } 1\leq k \leq N\}
 \end{equation}
