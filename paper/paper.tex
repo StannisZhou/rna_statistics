@@ -138,7 +138,6 @@
 \\
 Guangyao Zhou\textsuperscript{1*},
 Jackson Loper\textsuperscript{2},
-Matthew T. Harrison\textsuperscript{1},
 Stuart Geman\textsuperscript{1}
 \\
 \bigskip
@@ -148,7 +147,7 @@ Stuart Geman\textsuperscript{1}
 \\
 \bigskip
 
-* guangyao\_zhou@brown.edu
+* guangyao\_zhou@alumni.brown.edu
 
 \end{flushleft}
 
@@ -205,7 +204,7 @@ Instead of using the local ambiguities themselves, we focus on the {\em differen
 (The exceptions come from bulges, which account for about 20\% of the {\em double} locations in our data set.
 By our definition, segments are {\em consecutive} sequences. A segment that is part of a bulge does not necessarily match any consecutive sequence of four nucleotides.)
 With this in mind, we defined the D-S ambiguity index to be the average local ambiguity at those {\em double} locations that have at least one ambiguity minus the average over those {\em single} locations that have at least one ambiguity.\footnote{
-An argument could be made for including bulges in the definition of the {\em local ambiguity} in the first place. We have not explored this or other variations, though there is not shortage of arguably useful descriptive statistics for capturing the notion of ambiguity.}
+An argument could be made for including bulges in the definition of the {\em local ambiguity} in the first place. We have not explored this or other variations, though there is no shortage of arguably useful descriptive statistics for capturing the notion of ambiguity.}
 
 Using only primary and (comparative-analysis) secondary structures, elementary counting statistics, 
 and exact, distribution-free, tests,
@@ -294,12 +293,12 @@ we propose two {\em relative} ambiguity indexes: T-S and D-S, each of which depe
 where we have used
 $c_i^{\text{tran}}$ and $c_i^{\text{single}}$ for indicating whether location $i$ is {\it transitional} or {\it single} respectively. In other words, for each $i=1,2,\ldots,N-3$
 \begin{align}
-	c_i^{\text{tran}}(p, s) &=
+	c_i^{\text{tran}}(s) &=
 	\begin{cases}
 		1, & \text{if location $i$ is \textit{transitional}} \\
 		0, & \text{otherwise}
 	\end{cases} \\
-	c_i^{\text{single}}(p, s) &=
+	c_i^{\text{single}}(s) &=
 	\begin{cases}
 		1, & \text{if location $i$ is \textit{single}} \\
 		0, & \text{otherwise}
@@ -311,9 +310,9 @@ is likely to be at least one ($a_i\geq 1$), the D-S index involves only those {\
 \begin{equation}
 	d_\text{D-S}(p, s) = \frac
 	{\sum_{j = 0}^{N - 3} a_j (p) 
-	\hat{c}^{\text{double}}_j (s)}
+	\hat{c}^{\text{double}}_j (p, s)}
 	{\sum_{j = 0}^{N - 3} 
-	\hat{c}^{\text{double}}_j (s)} - 
+	\hat{c}^{\text{double}}_j (p, s)} - 
 	\frac
 	{\sum_{j = 0}^{N - 3} a_j (p) \hat{c}_j^{\text{single}} (p,s)}
 	{\sum_{j = 0}^{N - 3} \hat{c}_j^{\text{single}} (p,s)}
@@ -572,7 +571,7 @@ The results presented in this paper can be easily reproduced. Follow the intrust
 \end{itemize}
 
 \section*{Acknowledgments}
-The authors would like to thank Yang Chen for helpful discussions and Charles Lawrence for valuable comments and suggestions. This work was partially supported by the Office of Naval Research under Contract ONR N000141613168.
+The authors would like to thank Matthew T. Harrison and Yang Chen for helpful discussions and Charles Lawrence for valuable comments and suggestions. This work was partially supported by the Office of Naval Research under Contract ONR N000141613168.
 
 \nolinenumbers
 
