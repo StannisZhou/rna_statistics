@@ -10,6 +10,7 @@ dependencies:
   - python=3.6.6
   - scipy
   - tqdm
+  - statsmodels
   - pip:
     - multiprocess
     - scikit-learn

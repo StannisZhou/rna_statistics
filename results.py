@@ -1,10 +1,10 @@
 import os
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 import rna
 from sklearn.metrics import roc_curve, roc_auc_score
 from scipy.stats import hypergeom
+from statsmodels.nonparametric.smoothers_lowess import lowess
 
 GROUP_NAMES = {
     'Group_I_Introns': 'Group I Introns',
@@ -141,30 +141,30 @@ def generate_bound_unbound_figure(essential_data_by_family, fig_fname, tex_fname
             }
 
     plt.rc('text', usetex=True)
-    plt.rc('font', family='serif')
     fig, ax = plt.subplots(2, 2)
     for ii, index in enumerate(['T-S', 'D-S']):
         for jj, key in enumerate(['comparative', 'mfe']):
             x = results[key][index]['false_positive_rates']
             y = results[key][index]['true_positive_rates']
+            y = lowess(y, x, 0.1, return_sorted=False)
             auc = results[key][index]['auc_score']
-            ax[ii, jj].plot(x, y)
-            ax[ii, jj].set_xlabel('false positive rate')
-            ax[ii, jj].set_ylabel('true positive rate')
+            ax[ii, jj].plot(x, y, linewidth=2.0)
+            ax[ii, jj].set_xlabel('false positive rate', fontweight='bold')
+            ax[ii, jj].set_ylabel('true positive rate', fontweight='bold')
             if key == 'comparative':
                 name = key.capitalize()
             else:
                 name = key.upper()
 
-            ax[ii, jj].set_title('{}, $d_{{ {} }} < t$'.format(name, index))
-            ax[ii, jj].text(0.6, 0.2, 'AUC = {:.2f}'.format(auc))
+            ax[ii, jj].set_title('{}, $d_{{ {} }} < t$'.format(name, index), fontweight='bold')
+            ax[ii, jj].text(0.6, 0.2, 'AUC = {:.2f}'.format(auc), fontweight='bold')
 
     fig.tight_layout()
     fig.savefig(os.path.join('paper', fig_fname), dpi=400)
     with open(os.path.join('paper', tex_fname), 'w') as f:
         f.write('\\begin{figure}[h!]\n')
         f.write('\\centering\n')
-        f.write('\\includegraphics[width=0.7\\textwidth]{' + fig_fname +'}\n')
+        f.write('\\includegraphics[width=\\textwidth]{' + fig_fname +'}\n')
         f.write('\\vglue 0.5cm\n')
         f.write('''
 \\caption{{{{\\bf Bound or Unbound?}} ROC performance of classifiers based on thresholding T-S
@@ -176,7 +176,13 @@ p-value was also calculated, based only on the signs of the indexes and the null
 positive indexes are distributed randomly among molecules of all types as opposed to the alternative
 that positive indexes are more typically found among families of bound RNA. Under the null hypothesis,
 the test statistic is hypergeometric---see Eq \\ref{{eqn:null}}. {{\\em Upper Left:}} $p= {} $;
-{{\em Lower Left:}} $p={}$; {{\\em Upper Right:}} $p={:.2f}$;  {{\\em Lower Right:}} $p={:.2f}$.}}
+{{\em Lower Left:}} $p={}$; {{\\em Upper Right:}} $p={:.2f}$;  {{\\em Lower Right:}} $p={:.2f}$.
+In considering these extreme p-values, it is perhaps worth re-emphasizing the points made about the
+interpretation of p-values in the paragraph following Eq \\ref{{eqn:null}}. (These ROC curves and
+those in Figure \\ref{{fig:CompVSMFE}} were lightly smoothed by the method known as
+``Locally Weighted Scatterplot Smoothing,'' e.g. with the python command Y=lowess(Y, X, 0.1, return\_sorted=False)
+coming from \\textit{{statsmodels.nonparametric.smoothers\_lowess}}.)
+}}
 '''.format(latex_float(results['comparative']['T-S']['p_value']), latex_float(results['comparative']['D-S']['p_value']), results['mfe']['T-S']['p_value'], results['mfe']['D-S']['p_value']))
         f.write('\\label{fig:UnboundVSBound}\n')
         f.write('\\end{figure}\n')
@@ -252,25 +258,25 @@ def generate_comparative_mfe_figure(essential_data_by_family, fig_fname, tex_fna
             }
 
     plt.rc('text', usetex=True)
-    plt.rc('font', family='serif')
     fig, ax = plt.subplots(2, 2)
     for ii, index in enumerate(['T-S', 'D-S']):
         for jj, key in enumerate(['unbound', 'bound']):
             x = results[key][index]['false_positive_rates']
             y = results[key][index]['true_positive_rates']
+            y = lowess(y, x, 0.1, return_sorted=False)
             auc = results[key][index]['auc_score']
-            ax[ii, jj].plot(x, y)
-            ax[ii, jj].set_xlabel('false positive rate')
-            ax[ii, jj].set_ylabel('true positive rate')
-            ax[ii, jj].set_title('{} RNA, $d_{{ {} }} < t$'.format(key.capitalize(), index))
-            ax[ii, jj].text(0.6, 0.2, 'AUC = {:.2f}'.format(auc))
+            ax[ii, jj].plot(x, y, linewidth=2.0)
+            ax[ii, jj].set_xlabel('false positive rate', fontweight='bold')
+            ax[ii, jj].set_ylabel('true positive rate', fontweight='bold')
+            ax[ii, jj].set_title('{} RNA, $d_{{ {} }} < t$'.format(key.capitalize(), index), fontweight='bold')
+            ax[ii, jj].text(0.6, 0.2, 'AUC = {:.2f}'.format(auc), fontweight='bold')
 
     fig.tight_layout()
     fig.savefig(os.path.join('paper', fig_fname), dpi=400)
     with open(os.path.join('paper', tex_fname), 'w') as f:
         f.write('\\begin{figure}[h!]\n')
         f.write('\\centering\n')
-        f.write('\\includegraphics[width=0.7\\textwidth]{' + fig_fname + '}\n')
+        f.write('\\includegraphics[width=\\textwidth]{' + fig_fname + '}\n')
         f.write('\\vglue 0.5cm\n')
         f.write('''
 \\caption{{{{\\bf Comparative or MFE?}} As in Figure \\ref{{fig:UnboundVSBound}}, each panel
