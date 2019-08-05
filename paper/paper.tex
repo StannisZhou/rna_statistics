@@ -1,8 +1,5 @@
 \documentclass[10pt,letterpaper]{article}
 
-% Not sure what this does:
-\usepackage[top=0.85in,left=2.75in,footskip=0.75in]{geometry}
-
 % amsmath and amssymb packages, useful for mathematical formulas and symbols
 \usepackage{amsmath,amssymb,bm}
 
@@ -69,7 +66,7 @@
 \renewcommand{\figurename}{Fig}
 
 % Use the PLoS provided BiBTeX style
-\bibliographystyle{plos2015}
+\bibliographystyle{plain}
 
 % Remove brackets from numbering in List of References
 \makeatletter
@@ -82,21 +79,6 @@
 % Header and Footer with logo
 \usepackage{lastpage,fancyhdr,graphicx}
 \usepackage{epstopdf}
-\pagestyle{myheadings}
-\pagestyle{fancy}
-\fancyhf{}
-\setlength{\headheight}{27.023pt}
-%\lhead{\includegraphics[width=2.0in]{PLOS-submission.eps}}
-\rfoot{\thepage/\pageref{LastPage}}
-\renewcommand{\footrule}{\hrule height 2pt \vspace{2mm}}
-\fancyheadoffset[L]{2.25in}
-\fancyfootoffset[L]{2.25in}
-\lfoot{\sf PLOS}
-
-%% Include all macros below
-
-\newcommand{\lorem}{{\bf LOREM}}
-\newcommand{\ipsum}{{\bf IPSUM}}
 
 %% Customized Macros
 \usepackage{booktabs}
@@ -127,97 +109,8 @@
 
 
 \begin{document}
-\vspace*{0.2in}
-
-
-\begin{flushleft}
-{\Large
-\textbf\newline{Base-pair Ambiguity and the Kinetics of RNA Folding} 
-}
-\newline
-\\
-Guangyao Zhou\textsuperscript{1*},
-Jackson Loper\textsuperscript{2},
-Stuart Geman\textsuperscript{1}
-\\
-\bigskip
-\textbf{1} Division of Applied Mathematics, Brown University, Providence, RI, USA
-\\
-\textbf{2} Data Science Institute, Columbia University, New York, NY, USA
-\\
-\bigskip
-
-* guangyao\_zhou@alumni.brown.edu
-
-\end{flushleft}
 
 % Please keep the abstract below 300 words
-\section*{Abstract}
-The route to folding for a large non-coding RNA molecule is full of 
-kinetic traps---energetically favorable pairings of nucleotide sequences that are not part of the active structure. Yet many of these molecules spontaneously fold to a native structure when placed in a suitable chemical environment at an appropriate temperature.
-Levinthal's convincing arguments\cite{Levinthal1969-hi} (aka Levinthal's paradox) about proteins apply to RNA molecules as well, perhaps even more compellingly: arrival to thermal equilibrium should take a great deal more time than the biological lifetime of the organism. Evidently, mechanisms have evolved that contribute to a directed and efficient folding process, and quite possibly the active configuration is not at all like a sample from an equilibrium distribution, but rather a metastable state, provided only that it will typically last long enough for its purpose. 
-Based on the number of possible Watson-Crick or G$\cdot$U wobble pairings at each location, we
-introduce various measures of the difficulty in reaching a stable configuration, whether or not it is a true equilibrium.
-We call these measures ``ambiguity indexes,'' and focus on two, each of which is a function of both the primary and any given proposed secondary structure. Comparing families of RNA molecules that appear in ribonucleoproteins (``bound'' molecules) to RNA molecules that do not operate as nucleoproteins (``unbound'' molecules), we find that the unbound molecules have systematically lower ambiguity indexes, {\em provided that the indexes are computed using the comparative-analysis \cite{Gutell1992-hu} structure} (also known as the ``gold standard''). The effect largely disappears when the indexes are based, instead, on the so-called minimum-free energy (MFE) structures \cite{Mathews1999-hc,Zuker1999-rc}. Since MFE structures are derived from an approximation of the equilibrium distribution, we interpret these and other related results as evidence for metastable but not necessarily thermal equilibrium secondary structure. 
-
-%
-%
-%% Please keep the Author Summary between 150 and 200 words
-%% Use first person. PLOS ONE authors please skip this step. 
-%% Author Summary not valid for PLOS ONE submissions.   
-
-\linenumbers
-
-% Use "Eq" instead of "Equation" for equation citations.
-\section*{Author Summary}
-Recent discoveries indicate that, in addition to being a messenger between DNA and protein, RNA molecules assume a wide range of biological functions. For biological macromolecules, structure is function. Experimental determination of RNA structures is still time-consuming, and computational approaches are of great importance. The prevailing computational approach tries to find the structure with the minimum energy, yet the relevance of this minimum energy structure to the native structure is still hotly debated. In this paper, we adopt a kinetic perspective, and argue that more emphasis should be placed on the folding process when trying to develop computational methods for RNA structure prediction. We present some statistical analyses using the primary and secondary data (sequence and base-pairs data) of RNA molecules, based on the concept of ``local ambiguity", i.e. the molecule's tendency to ``make a mistake" at a certain location when forming secondary structures. Our results highlight deficiencies in the minimum-energy approach, and demonstrate the importance of considering kinetics as well as protein-RNA interactions in developing computational approaches for RNA secondary structure prediction.
-
-\linenumbers
-
-\section*{Introduction}
-
-Discoveries in recent decades have established a wide range of biological roles served by RNA molecules, in addition to their better-known role as carriers of the coded messages that direct ribosomes to construct specific proteins. Non-coding RNA molecules participate in gene regulation, DNA and RNA repair, splicing and self-splicing, catalysis, protein synthesis, and intracellular transportation \cite{Morris2014-iu,Kung2013-se}. To understand the mechanisms of these actions, emphasis has to be placed on the native structures, both secondary and tertiary. Our focus here will be on secondary structure, often a vital intermediary, and a useful abstraction for understanding the functions of non-coding RNA molecules \cite{Higgs2000-gj}.
-
-Because of the time-consuming nature of experimental determination of RNA structures, a considerable amount of work has been put into computational (as opposed to experimental) approaches. For secondary structure prediction, comparative analysis is the gold standard  \cite{Gutell1992-hu}. But accurate comparative analysis typically requires a large number of homologous sequences, which may or may not be available. On the other hand, the prevailing {\em computational} approaches are based on an important and controversial assumption\cite{Flamm2008-ir}. Namely, that the structures of  non-coding RNA molecules, {\em in vivo}, are in thermal equilibrium. If this were the case, and if the configuration energies could be accurately specified, then secondary (and in principle, even tertiary) structures could be explored through Monte Carlo sampling from the Boltzmann equilibrium distribution. Alternatively, depending on the nature of the energy landscape, secondary structures could be approximated by identifying the minimum free energy (MFE) configuration  \cite{Mathews1999-hc,Zuker1999-rc}. However, even if we put aside the necessity for approximations, the biological relevance of equilibrium configurations has been a source of misgivings at least since 1969, when Levinthal pointed out that the time required to equilibrate might be too long by many orders of magnitude  \cite{Levinthal1969-hi}. In light of these observations, and considering the ``frustrated'' nature of the folding landscape, many have argued that when it comes to structure prediction for macromolecules, kinetic accessibility is more relevant than equilibrium thermodynamics  \cite{Higgs2000-gj,Flamm2008-ir,Baker1994-px}. In fact, a metastable state that is sufficiently long-lived and accessible might be biologically indistinguishable from an equilibrium state.
-
-The primary structures of RNA molecules typically afford many opportunities to form short or medium-length stems,\footnote{
-By which we will mean sequences of G$\cdot$U (``wobble pairs'') and/or Watson-Crick pairs.}
-most of which do not participate in the native structure. This situation not only makes it hard for the biologist to accurately predict secondary structure, but equally challenges the molecule to avoid these ``energetic traps.'' Once formed, they require a large amount of energy (not to mention time) to be unformed. By what mechanisms might these traps be discouraged, if not actually avoided? 
-Ideally, the only stems available in the primary structure would be those that participate in the secondary structure, but this is obviously too restrictive for all but the shortest or simplest of the structural RNA molecules. Still, there can be little doubt that the necessity for repeatable and efficient folding produces a selective pressure against the more disruptive ambiguities---e.g.
-a sequence that can form half of either of two stems, both of which are kinetically accessible and stable, but only one of which is native, or a sequence that is unpaired in the native structure but can nonetheless form a stem that is stereochemically inconsistent with the native structure. By this reasoning, which emphasizes kinetics rather than equilibrium, {\em per se}, we might expect to find information in the intra-molecular ambiguities about the folding process, or even the native structure.  
-
-We will introduce quantitative measures of ambiguity and demonstrate their statistical relationships to native secondary structure and to qualitative distinctions between RNA families.
-Using a somewhat arbitrary convention, we will
-refer to sequences of length four (four consecutive nucleotides) as {\em segments}. Keeping this convention in mind, each line of statistical
-evidence is based on the same formal definition of the ``local ambiguity'' of a given segment. This is simply the number of its complementary pairs in the molecule. 
-When we refer to the {\em location} of a segment, we will mean the location of the first element of the segment, counting from 5$^\prime$ to 3$^\prime$, and  
-when we refer to the local ambiguity of a location, we will mean the local ambiguity of the segment at that location. 
-Local ambiguity is an intrinsic property of the primary structure. We will be interested in exposing its statistical relationships to any given candidate secondary structure of the same molecule. For this purpose, for any particular secondary structure we distinguish three different kinds of locations:
-\begin{description}
-	\item[\textit{Single}:] Locations where all nucleotides in the corresponding segment are unpaired in the secondary structure;
-	\item[\textit{Double}:] Locations where all nucleotides in the corresponding segment are paired in the secondary structure;
-	\item[\textit{Transitional}:] Locations where some nucleotides in the corresponding segment are paired and others are unpaired in the secondary structure.
-\end{description}
-{\em Double} and {\em transitional} locations participate in the candidate secondary structure, while {\em single} locations do not.
-As a general rule, local ambiguities measured at any of these locations will increase with the length of the molecule---there are simply more opportunities to find complementary sequences.
-Instead of using the local ambiguities themselves, we focus on the {\em differences} between ambiguities in and around stems ({\em double} and {\em transitional} locations) from those at unpaired ({\em single}) locations. In particular, we defined the ``T-S ambiguity index'' to be the difference between the average local ambiguity at {\em transitional} locations minus the average at {\em single} locations. We defined the ``D-S ambiguity index'' similarly, but adjusted for an evident bias at {\em double} locations, most of which will have at least one complementary pair somewhere in the molecule. 
-(The exceptions come from bulges, which account for about 20\% of the {\em double} locations in our data set.
-By our definition, segments are {\em consecutive} sequences. A segment that is part of a bulge does not necessarily match any consecutive sequence of four nucleotides.)
-With this in mind, we defined the D-S ambiguity index to be the average local ambiguity at those {\em double} locations that have at least one ambiguity minus the average over those {\em single} locations that have at least one ambiguity.\footnote{
-An argument could be made for including bulges in the definition of the {\em local ambiguity} in the first place. We have not explored this or other variations, though there is no shortage of arguably useful descriptive statistics for capturing the notion of ambiguity.}
-
-Using only primary and (comparative-analysis) secondary structures, elementary counting statistics, 
-and exact, distribution-free, tests,
-we will give evidence that
-both the T-S and D-S ambiguity indexes 
-significantly separate two groups of non-coding RNA molecules: one group consists of  RNA families that operate, {\em in vivo}, as single entities---the Group I and Group II Introns;
-the other group is made up of RNA families  known to be active as protein-RNA complexes (i.e. as ribonculeoproteins)---the transfer-messenger RNAs (tmRNA), the RNAs of signal recognition particles (SRP RNA), the ribonuclease P family (RNase P), and the 16s and 23s ribosomal RNAs (16s and 23s rRNA). In particular, ``unbound'' RNA molecules, which perform their functions without being part of a larger nucleoprotein complex, have systematically lower T-S and D-S ambiguity indexes than the ``bound'' RNA molecules found in ribonucleoproteins. 
-There are many possible explanations (see {\em Discussion}). From the kinetic viewpoint, one possibility is that unbound molecules are more sensitive to ambiguities and their energy traps, especially those ambiguities that involve the structurally critical {\em double} and {\em transitional} regions. The secondary structures of bound molecules, on the other hand, are likely influenced by their chemical relationships to proteins. Perhaps, therefore, they are less sensitive to forming unwanted stems. Interestingly, this distinction between the ambiguity indexes of bound and unbound molecules largely disappears when MFE structures are used instead of comparative-analysis structures in defining {\em double}, {\em transitional}, and {\em single} locations. In fact, for most unbound molecules we can classify a candidate secondary
-structure (was it derived from comparative analysis or by a minimum-free-energy calculation?) just by looking at the difference in the T-S or the D-S index under the two structures.
-
-The {\em Results} section is organized as follows:  we first develop some basic notation and definitions, and then present an exploratory and largely informal statistical analysis. This is followed by formal results comparing ambiguities in unbound versus bound molecules, and then by a comparison of the ambiguities implied by secondary structures derived from comparative analyses to those derived through minimization of free energy. 
-The {\em Results} section is followed by a {\em Discussion}, and then by the section on {\em Materials and Methods}, which, among other things, includes detailed information about the data and its (open) source, as well as links to code that can be used to reproduce our results or for further experimentation. 
-
 \section*{Results}
 
 \subsection*{Basic Notation and Definitions}
@@ -514,66 +407,7 @@ $0.01$ (bound population).
 
 \input{comparative_mfe.tex}
 
-\section*{Discussion}
-We have introduced two indexes designed as coarse measures of the prevalence of kinetic traps in the energy landscape of a structural RNA molecule. These indexes, which we call the T-S and D-S ambiguity indexes, are each a function of both the primary and any presumed secondary structure of the molecule. The first, the T-S index, compares the availability of pairings (i.e. stems that are not part of the purported secondary structure) of sequences straddling transitions from double to single-stranded regions to the availability of pairings strictly within single-stranded regions.
-The second, the D-S index, results from a similar calculation, but using double-stranded sequences in place of {\em transitional} sequences. We have given evidence that either index can be used effectively to classify unbound RNA (molecules that do not act as components of ribonucleoproteins) from bound RNA (those that are components of ribonucleoproteins), {\em provided that the secondary structure is derived from comparative analysis}. 
-Specifically, unbound molecules typically have lower ambiguity indexes than bound molecules. On the other hand, there is little evidence for this effect in the ambiguity indexes derived instead from MFE analyses, and classifiers based on MFE secondary structure are substantially less accurate. Furthermore, either index, T-S or D-S, can be used in unbound molecules to effectively classify a given secondary structure as derived from comparative as opposed to MFE analysis, but not in bound molecules. In particular, among unbound molecules comparative-analysis structures typically have lower ambiguity indexes than MFE structures.
-
-Both classifications, distinguishing unbound from bound molecules using comparative secondary structures and distinguishing comparative from MFE secondary structures in unbound molecules, are stronger when they are based on the T-S index rather than the D-S index. Though highly speculative, this would make sense if it were the case that stems were typically nucleated at one or the other end (what we have called {\em transitional} locations), as opposed to locations (sequences of four nucleotides) completely contained in a stem structure. In other words, does nucleation typically occur near the ends or in the interiors of stems? Our data appears to favor the former. 
-
-Among our goals is to stress the possible importance of kinetics, as opposed to thermal equilibrium {\em per se}, in the determination of native structure. Demonstrably, many non-coding RNA molecules will spontaneously fold and then remain in apparent equilibrium in their biologically active structures. 
-But biological stability is relative to biological timescale; the folding of any particular RNA could just as well end in metastability, provided that the process is repeatable and the result sufficiently stable over the molecule's proper biological lifetime. Indeed, it would be arguably easier to evolve an effective tertiary structure without the additional and unnecessary burden of thermal equilibrium. 
-However, and this has often been pointed out (e.g. \cite{Ding2003-sv, Mathews2006-th}), the MFE structure itself may be a poor representative of thermal equilibrium. It is  possible, then, that our observations to the effect that comparative and MFE structures have substantially different relationships to the ambiguity indexes, and our interpretation that comparative structures better separate unbound from bound molecules, would not hold up as well if we were to adopt a more ensemble-oriented structure in place of the MFE, as advocated by \cite{Ding2005-br}, for example.
-
-Our expectation was that {\em transitional} and {\em double} locations would be relatively more protected from kinetic traps than {\em single} locations, and hence the focus on D and T relative to S in the formulation of the indexes. But this coin has another side: high ambiguity of {\em single} locations could certainly discourage, if not actually stereochemically prevent, access to native stems. In a related vein, Lin et al. \cite{Lin2018-xl} have given evidence that competing stems which are inconsistent may {\em both} contain a high measure of information about the equilibrium distribution, suggesting that in such cases both forms could be active and the notion of {\em single} might itself be ambiguous. This analysis, though, does presume the relevance of the equilibrium distribution, against which Levinthal's observations make for some compelling arguments.
-
-Concerning bound molecules, some of the unpaired RNA sequences may be critical to function, as in the 
-messenger RNA-like (``MLR'') region of tmRNA, and therefore relatively unambiguous. 
-This effect would be expected to raise both the T-S and D-S indexes, especially if the molecule's secondary structure develops in conjunction with and dependent on the protein contributions to the ribonuclear complex. In sum, 
-an operational role for unpaired nucleotides together with contextual effects on stem formations may help to explain the substantial drop in T-S and D-S indexes when going from unbound to bound molecules. More generally, 
-there are many such lines of reasoning, most of which suggest new indexes that could be statistically explored, especially as the data bank of known structures and functions continues to grow.
-
-
-
-\section*{Materials and Methods}
-\subsection*{Datasets}
-
-We obtained comparative-analysis secondary structure data for seven different families of RNA molecules from the RNA STRAND database\cite{Andronescu2008-rj}, a curated collection of RNA secondary structures. These families include: Group I Introns and Group II Introns\cite{Cannone2002-tp}, tmRNAs and SRP RNAs\cite{Andersen2006-uh}, the Ribonuclease P RNAs\cite{Brown1999-co}, and 16s rRNAs and 23s rRNAs\cite{Cannone2002-tp}. Table \ref{table:lengths} contains information about the numbers and lengths (measured in nucleotides) of the RNA molecules in each of the seven families. Note that we excluded families like tRNAs, 5s rRNAs and hammerhead ribozymes since most of the molecules in these families are too short to be of interest for our purpose. Also, since we are focusing on comparative-analysis secondary structures, to be consistent, we excluded any secondary structures derived from X-ray crystallography or NMR structures.
-
-Note that Group I and Group II Introns are the only available families of unbound RNAs suitable for our analysis. There are some other families of unbound RNAs (e.g. ribozymes), but most of these RNAs are too short in length, and many of the structures are not derived using comparative analysis. Hence they are not included.
-
-\vglue .1cm
-\begin{table}[h!]
-\begin{center}
-\begin{tabular}{ l || r | r | r| r}
-\hglue 5mm {\bf family} & {\bf number} & {\bf min length} & {\bf max length} & {\bf median} \\ \hline \hline
-\input{data_summary.tex}
-\end{tabular}
-\vglue .5cm
-\caption{\footnotesize {\bf Data Summary.} The seven families of RNA used in the experiments. Table includes the number of molecules in each family, as well as basic statistics about the numbers of nucleotides in the primary sequence of each of the molecules. Data was downloaded from the \href{http://www.rnasoft.ca/strand/}{RNA STRAND database}.}
-\label{table:lengths}
-\end{center}
-\end{table}
-
-
-\subsection*{RNA Secondary Structure Prediction Methods}
-Comparative analysis\cite{Gutell1992-hu} is based on the simple principle that a single RNA secondary structure can be formed from different RNA sequences. Using alignments of homologous sequences, comparative analysis has proven to be highly accurate in determining RNA secondary structures\cite{Gutell2002-ei}. We used a large set of RNA secondary structures determined by comparative analyses to serve as ground truth.
-
-When it comes to computational prediction of RNA secondary structures, exact dynamic programming algorithms based on carefully measured thermodynamic parameters make up the most prevalent methods. There exist a large number of software packages for the energy minization \cite{Lorenz2011-eb, Markham2008-ku, Reuter2010-bw, Zadeh2011-eu, Hamada2009-yf, Ding2003-sv, Reeder2009-xl}. In this paper, we used the \href{https://www.tbi.univie.ac.at/RNA/}{ViennaRNA package} \cite{Lorenz2011-eb} to obtain the MFE secondary structures for our statistical analysis.
-
-\subsection*{Reproducing the Results}
-The results presented in this paper can be easily reproduced. Follow the intrustions on \url{https://github.com/StannisZhou/rna_statistics}. Here we make a few comments regarding some implementation details.
-\begin{itemize}
-	\item In the process of obtaining the data, we used the \textit{bpseq} format, and excluded structures derived from X-ray crystallography or NMR structures, as well as structures for duplicate sequences. Concretely, this means picking a particular type, and select \textit{No} for \textit{Validated by NMR or X-Ray} and \textit{Non-redundant sequences only} for \textit{Duplicates} on the \href{http://www.rnasoft.ca/strand/search.php}{search page} of the RNA STRAND database. A copy of the data we used is included in the \href{https://github.com/StannisZhou/rna_statistics/tree/master/data}{GitHub repository}, but the same analyses can be easily  applied to other data.
-	\item When processing the data, we ignored molecules for which we have nucleotides other than \textit{A, G, C, U}, and molecules for which we don't have any base pairs.
-	\item When comparing the local ambiguities in different regions of the RNA molecules, we ignored molecules for which we have empty regions (i.e. at least one of \textit{single, double} and \textit{transitional} is empty), as well as molecules where all local ambiguities in \textit{single} or \textit{double} regions are 0.
-	\item For shuffling primary structures, we used an efficient and flexible implementation of the Euler algorithm\cite{Kandel1996-kz, Fitch1983-ec, Altschul1985-nq} called uShuffle \cite{Jiang2008-yj}, which is conveniently available as a \href{https://github.com/guma44/ushuffle}{python package}.
-\end{itemize}
-
-\section*{Acknowledgments}
-The authors would like to thank Yang Chen for helpful discussions and Matthew T. Harrison and Charles Lawrence for many valuable suggestions.
-
-\nolinenumbers
+\newpage
 
 \bibliography{reference.bib}
 
