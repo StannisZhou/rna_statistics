@@ -1,10 +1,8 @@
-import pickle
 import os
-import numpy as np
-import scipy.io
+import pickle
+
 import data
 import results
-
 
 K, r = 10000, 4
 data_folder = os.path.abspath('data')
@@ -53,15 +51,11 @@ data_summary_fname = 'data_summary.tex'
 results.generate_exploratory_analysis_tables(
     essential_data_by_family, exploratory_comparative_fname, exploratory_mfe_fname
 )
-results.generate_formal_analysis_table(
-    essential_data_by_family, formal_analysis_fname
-)
+results.generate_formal_analysis_table(essential_data_by_family, formal_analysis_fname)
 results.generate_bound_unbound_figure(
     essential_data_by_family, bound_unbound_fig_fname, bound_unbound_tex_fname
 )
 results.generate_comparative_mfe_figure(
     essential_data_by_family, comparative_mfe_fig_fname, comparative_mfe_tex_fname
 )
-results.generate_data_summary_table(
-    essential_data_by_family, data_summary_fname
-)
+results.generate_data_summary_table(essential_data_by_family, data_summary_fname)

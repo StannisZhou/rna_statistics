@@ -1,10 +1,12 @@
 import os
-import numpy as np
+
 import matplotlib.pyplot as plt
-import rna
-from sklearn.metrics import roc_curve, roc_auc_score
+import numpy as np
 from scipy.stats import hypergeom
+from sklearn.metrics import roc_auc_score, roc_curve
 from statsmodels.nonparametric.smoothers_lowess import lowess
+
+import rna
 
 GROUP_NAMES = {
     'Group_I_Introns': 'Group I Introns',
@@ -13,11 +15,15 @@ GROUP_NAMES = {
     'SRP_RNAs': 'SRP RNA',
     'RNase_Ps': 'RNase P',
     '16s_ribosomal': '16s rRNA',
-    '23s_ribosomal': '23s rRNA'
+    '23s_ribosomal': '23s rRNA',
 }
 SINGLE_ENTITY_RNAS = ['Group_I_Introns', 'Group_II_Introns']
 PROTEIN_RNA_COMPLEXES = [
-    'SRP_RNAs', 'tmRNAs', 'RNase_Ps', '16s_ribosomal', '23s_ribosomal'
+    'SRP_RNAs',
+    'tmRNAs',
+    'RNase_Ps',
+    '16s_ribosomal',
+    '23s_ribosomal',
 ]
 
 
@@ -27,24 +33,12 @@ def get_essential_data_by_family(essential_data):
         n_molecules = len(list(essential_data[group].keys()))
         molecule_lengths = np.zeros(n_molecules, dtype=int)
         ambiguity_index = {
-            'comparative': {
-                'T-S': np.zeros(n_molecules),
-                'D-S': np.zeros(n_molecules)
-            },
-            'mfe': {
-                'T-S': np.zeros(n_molecules),
-                'D-S': np.zeros(n_molecules)
-            }
+            'comparative': {'T-S': np.zeros(n_molecules), 'D-S': np.zeros(n_molecules)},
+            'mfe': {'T-S': np.zeros(n_molecules), 'D-S': np.zeros(n_molecules)},
         }
         alpha_index = {
-            'comparative': {
-                'T-S': np.zeros(n_molecules),
-                'D-S': np.zeros(n_molecules)
-            },
-            'mfe': {
-                'T-S': np.zeros(n_molecules),
-                'D-S': np.zeros(n_molecules)
-            }
+            'comparative': {'T-S': np.zeros(n_molecules), 'D-S': np.zeros(n_molecules)},
+            'mfe': {'T-S': np.zeros(n_molecules), 'D-S': np.zeros(n_molecules)},
         }
         for ff, fname in enumerate(essential_data[group]):
             molecule_lengths[ff] = essential_data[group][fname]['length']
@@ -61,44 +55,46 @@ def get_essential_data_by_family(essential_data):
             'n_molecules': n_molecules,
             'molecule_lengths': molecule_lengths,
             'ambiguity_index': ambiguity_index,
-            'alpha_index': alpha_index
+            'alpha_index': alpha_index,
         }
 
     return essential_data_by_family
 
 
-def generate_exploratory_analysis_tables(essential_data_by_family, comparative_fname, mfe_fname):
+def generate_exploratory_analysis_tables(
+    essential_data_by_family, comparative_fname, mfe_fname
+):
     with open(os.path.join('paper', comparative_fname), 'w') as f:
         for group in rna.RNA_GROUPS:
             data = essential_data_by_family[group]
-            f.write(' {} & {} & {} & {:.3f} & {:.3f} \\\\ \\hline\n'.format(
-                GROUP_NAMES[group], data['n_molecules'],
-                int(np.median(data['molecule_lengths'])),
-                np.median(data['alpha_index']['comparative']['T-S']),
-                np.median(data['alpha_index']['comparative']['D-S'])
-            ))
+            f.write(
+                ' {} & {} & {} & {:.3f} & {:.3f} \\\\ \\hline\n'.format(
+                    GROUP_NAMES[group],
+                    data['n_molecules'],
+                    int(np.median(data['molecule_lengths'])),
+                    np.median(data['alpha_index']['comparative']['T-S']),
+                    np.median(data['alpha_index']['comparative']['D-S']),
+                )
+            )
 
     with open(os.path.join('paper', mfe_fname), 'w') as f:
         for group in rna.RNA_GROUPS:
             data = essential_data_by_family[group]
-            f.write(' {} & {} & {} & {:.3f} & {:.3f} \\\\ \\hline\n'.format(
-                GROUP_NAMES[group], data['n_molecules'],
-                int(np.median(data['molecule_lengths'])),
-                np.median(data['alpha_index']['mfe']['T-S']),
-                np.median(data['alpha_index']['mfe']['D-S'])
-            ))
+            f.write(
+                ' {} & {} & {} & {:.3f} & {:.3f} \\\\ \\hline\n'.format(
+                    GROUP_NAMES[group],
+                    data['n_molecules'],
+                    int(np.median(data['molecule_lengths'])),
+                    np.median(data['alpha_index']['mfe']['T-S']),
+                    np.median(data['alpha_index']['mfe']['D-S']),
+                )
+            )
 
 
 def generate_bound_unbound_figure(essential_data_by_family, fig_fname, tex_fname):
     ambiguity_index = {
-        'comparative': {
-            'T-S': [],
-            'D-S': []
-        },
-        'mfe': {
-            'T-S': [],
-            'D-S': []
-        }
+        'comparative': {'T-S': [], 'D-S': []},
+        'mfe': {'T-S': [], 'D-S': []},
     }
     labels = []
     for group in essential_data_by_family:
@@ -127,17 +123,13 @@ def generate_bound_unbound_figure(essential_data_by_family, fig_fname, tex_fname
             false_positive_rates, true_positive_rates, _ = roc_curve(
                 labels, -ambiguity_index[key][index]
             )
-            auc_score = roc_auc_score(
-                labels, -ambiguity_index[key][index]
-            )
-            p_value = get_hypergeometric_p_value(
-                ambiguity_index[key][index], labels
-            )
+            auc_score = roc_auc_score(labels, -ambiguity_index[key][index])
+            p_value = get_hypergeometric_p_value(ambiguity_index[key][index], labels)
             results[key][index] = {
                 'true_positive_rates': true_positive_rates,
                 'false_positive_rates': false_positive_rates,
                 'auc_score': auc_score,
-                'p_value': p_value
+                'p_value': p_value,
             }
 
     plt.rc('text', usetex=True)
@@ -156,7 +148,9 @@ def generate_bound_unbound_figure(essential_data_by_family, fig_fname, tex_fname
             else:
                 name = key.upper()
 
-            ax[ii, jj].set_title('{}, $d_{{ {} }} < t$'.format(name, index), fontweight='bold')
+            ax[ii, jj].set_title(
+                '{}, $d_{{ {} }} < t$'.format(name, index), fontweight='bold'
+            )
             ax[ii, jj].text(0.6, 0.2, 'AUC = {:.2f}'.format(auc), fontweight='bold')
 
     fig.tight_layout()
@@ -164,9 +158,10 @@ def generate_bound_unbound_figure(essential_data_by_family, fig_fname, tex_fname
     with open(os.path.join('paper', tex_fname), 'w') as f:
         f.write('\\begin{figure}[h!]\n')
         f.write('\\centering\n')
-        f.write('\\includegraphics[width=\\textwidth]{' + fig_fname +'}\n')
+        f.write('\\includegraphics[width=\\textwidth]{' + fig_fname + '}\n')
         f.write('\\vglue 0.5cm\n')
-        f.write('''
+        f.write(
+            '''
 \\caption{{{{\\bf Bound or Unbound?}} ROC performance of classifiers based on thresholding T-S
 and D-S ambiguity indexes. Small values are taken as evidence for molecules that are active as
 single entities (unbound), as opposed to parts of ribonucleoproteins (bound). Classifiers in the
@@ -183,26 +178,23 @@ those in Figure \\ref{{fig:CompVSMFE}} were lightly smoothed by the method known
 ``Locally Weighted Scatterplot Smoothing,'' e.g. with the python command Y=lowess(Y, X, 0.1, return\_sorted=False)
 coming from \\textit{{statsmodels.nonparametric.smoothers\_lowess}}.)
 }}
-'''.format(latex_float(results['comparative']['T-S']['p_value']), latex_float(results['comparative']['D-S']['p_value']), results['mfe']['T-S']['p_value'], results['mfe']['D-S']['p_value']))
+'''.format(
+                latex_float(results['comparative']['T-S']['p_value']),
+                latex_float(results['comparative']['D-S']['p_value']),
+                results['mfe']['T-S']['p_value'],
+                results['mfe']['D-S']['p_value'],
+            )
+        )
         f.write('\\label{fig:UnboundVSBound}\n')
         f.write('\\end{figure}\n')
 
 
 def generate_comparative_mfe_figure(essential_data_by_family, fig_fname, tex_fname):
     ambiguity_index = {
-        'bound': {
-            'T-S': [],
-            'D-S': []
-        },
-        'unbound': {
-            'T-S': [],
-            'D-S': []
-        }
+        'bound': {'T-S': [], 'D-S': []},
+        'unbound': {'T-S': [], 'D-S': []},
     }
-    labels = {
-        'bound': [],
-        'unbound': []
-    }
+    labels = {'bound': [], 'unbound': []}
     for key in ['comparative', 'mfe']:
         for group in SINGLE_ENTITY_RNAS:
             for index in ambiguity_index['unbound']:
@@ -211,9 +203,13 @@ def generate_comparative_mfe_figure(essential_data_by_family, fig_fname, tex_fna
                 )
 
             if key == 'comparative':
-                labels['unbound'].append(np.ones(essential_data_by_family[group]['n_molecules']))
+                labels['unbound'].append(
+                    np.ones(essential_data_by_family[group]['n_molecules'])
+                )
             elif key == 'mfe':
-                labels['unbound'].append(np.zeros(essential_data_by_family[group]['n_molecules']))
+                labels['unbound'].append(
+                    np.zeros(essential_data_by_family[group]['n_molecules'])
+                )
             else:
                 raise Exception('Unknown secondary structure {}'.format(group))
 
@@ -224,9 +220,13 @@ def generate_comparative_mfe_figure(essential_data_by_family, fig_fname, tex_fna
                 )
 
             if key == 'comparative':
-                labels['bound'].append(np.ones(essential_data_by_family[group]['n_molecules']))
+                labels['bound'].append(
+                    np.ones(essential_data_by_family[group]['n_molecules'])
+                )
             elif key == 'mfe':
-                labels['bound'].append(np.zeros(essential_data_by_family[group]['n_molecules']))
+                labels['bound'].append(
+                    np.zeros(essential_data_by_family[group]['n_molecules'])
+                )
             else:
                 raise Exception('Unknown secondary structure {}'.format(group))
 
@@ -244,9 +244,7 @@ def generate_comparative_mfe_figure(essential_data_by_family, fig_fname, tex_fna
             false_positive_rates, true_positive_rates, _ = roc_curve(
                 labels[key], -ambiguity_index[key][index]
             )
-            auc_score = roc_auc_score(
-                labels[key], -ambiguity_index[key][index]
-            )
+            auc_score = roc_auc_score(labels[key], -ambiguity_index[key][index])
             p_value = get_hypergeometric_p_value(
                 ambiguity_index[key][index], labels[key]
             )
@@ -254,7 +252,7 @@ def generate_comparative_mfe_figure(essential_data_by_family, fig_fname, tex_fna
                 'true_positive_rates': true_positive_rates,
                 'false_positive_rates': false_positive_rates,
                 'auc_score': auc_score,
-                'p_value': p_value
+                'p_value': p_value,
             }
 
     plt.rc('text', usetex=True)
@@ -268,7 +266,10 @@ def generate_comparative_mfe_figure(essential_data_by_family, fig_fname, tex_fna
             ax[ii, jj].plot(x, y, linewidth=2.0)
             ax[ii, jj].set_xlabel('false positive rate', fontweight='bold')
             ax[ii, jj].set_ylabel('true positive rate', fontweight='bold')
-            ax[ii, jj].set_title('{} RNA, $d_{{ {} }} < t$'.format(key.capitalize(), index), fontweight='bold')
+            ax[ii, jj].set_title(
+                '{} RNA, $d_{{ {} }} < t$'.format(key.capitalize(), index),
+                fontweight='bold',
+            )
             ax[ii, jj].text(0.6, 0.2, 'AUC = {:.2f}'.format(auc), fontweight='bold')
 
     fig.tight_layout()
@@ -278,7 +279,8 @@ def generate_comparative_mfe_figure(essential_data_by_family, fig_fname, tex_fna
         f.write('\\centering\n')
         f.write('\\includegraphics[width=\\textwidth]{' + fig_fname + '}\n')
         f.write('\\vglue 0.5cm\n')
-        f.write('''
+        f.write(
+            '''
 \\caption{{{{\\bf Comparative or MFE?}} As in Figure \\ref{{fig:UnboundVSBound}}, each panel
 depicts the ROC performance of a classifier based on thresholding the T-S (top two panels) or
 D-S (bottom two panels) ambiguity indexes. Here, small values are taken as evidence for
@@ -290,7 +292,13 @@ of the indexes. In each case and the null hypothesis is that comparative seconda
 likely to lead to positive ambiguity indexes as are MFE structures, whereas the alternative is
 that positive ambiguity indexes are more typical when derived from MFE structures:
 {{\\em Upper Left:}} $p= {} $; {{\em Upper Right:}} $p={:.2f}$; {{\\em Lower Left:}} $p={}$;  {{\\em Lower Right:}} $p={:.2f}$.}}
-'''.format(latex_float(results['unbound']['T-S']['p_value']), results['bound']['T-S']['p_value'], latex_float(results['unbound']['D-S']['p_value']), results['bound']['D-S']['p_value']))
+'''.format(
+                latex_float(results['unbound']['T-S']['p_value']),
+                results['bound']['T-S']['p_value'],
+                latex_float(results['unbound']['D-S']['p_value']),
+                results['bound']['D-S']['p_value'],
+            )
+        )
         f.write('\\label{fig:CompVSMFE}\n')
         f.write('\\end{figure}\n')
 
@@ -299,25 +307,31 @@ def generate_formal_analysis_table(essential_data_by_family, fname):
     with open(os.path.join('paper', fname), 'w') as f:
         for group in rna.RNA_GROUPS:
             data = essential_data_by_family[group]
-            f.write(' {} & {} & {} & {} & {} & {} \\\\  \\hline\n'.format(
-                GROUP_NAMES[group], data['n_molecules'],
-                np.sum(data['ambiguity_index']['comparative']['T-S'] > 0),
-                np.sum(data['ambiguity_index']['comparative']['D-S'] > 0),
-                np.sum(data['ambiguity_index']['mfe']['T-S'] > 0),
-                np.sum(data['ambiguity_index']['mfe']['D-S'] > 0),
-            ))
+            f.write(
+                ' {} & {} & {} & {} & {} & {} \\\\  \\hline\n'.format(
+                    GROUP_NAMES[group],
+                    data['n_molecules'],
+                    np.sum(data['ambiguity_index']['comparative']['T-S'] > 0),
+                    np.sum(data['ambiguity_index']['comparative']['D-S'] > 0),
+                    np.sum(data['ambiguity_index']['mfe']['T-S'] > 0),
+                    np.sum(data['ambiguity_index']['mfe']['D-S'] > 0),
+                )
+            )
 
 
 def generate_data_summary_table(essential_data_by_family, fname):
     with open(os.path.join('paper', fname), 'w') as f:
         for group in rna.RNA_GROUPS:
             data = essential_data_by_family[group]
-            f.write(' {} & {} & {} & {} & {} \\\\ \\hline\n'.format(
-                GROUP_NAMES[group], data['n_molecules'],
-                np.min(data['molecule_lengths']),
-                np.max(data['molecule_lengths']),
-                int(np.median(data['molecule_lengths']))
-            ))
+            f.write(
+                ' {} & {} & {} & {} & {} \\\\ \\hline\n'.format(
+                    GROUP_NAMES[group],
+                    data['n_molecules'],
+                    np.min(data['molecule_lengths']),
+                    np.max(data['molecule_lengths']),
+                    int(np.median(data['molecule_lengths'])),
+                )
+            )
 
 
 def get_hypergeometric_p_value(values, labels):

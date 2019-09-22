@@ -1,10 +1,11 @@
 import os
 import re
 import sys
+
 import numpy as np
+
 import rna
 from tqdm import tqdm
-
 
 ALPHABET = ['A', 'G', 'C', 'U']
 
@@ -55,7 +56,9 @@ def process_raw_data(data_folder):
                 print('Processing {}'.format(file_name))
                 _, file_ext = os.path.splitext(file_name)
                 if file_ext == '.bpseq':
-                    header, primary_structure, secondary_structure = parse_bpseq(file_name)
+                    header, primary_structure, secondary_structure = parse_bpseq(
+                        file_name
+                    )
                 else:
                     raise Exception('Unsupported RNA data format {}'.format(file_ext))
 
@@ -72,7 +75,9 @@ def process_raw_data(data_folder):
                     rna_molecules[group][name]['full_path'] = file_name
                     rna_molecules[group][name]['header'] = header
                     rna_molecules[group][name]['primary_structure'] = primary_structure
-                    rna_molecules[group][name]['secondary_structure'] = secondary_structure
+                    rna_molecules[group][name][
+                        'secondary_structure'
+                    ] = secondary_structure
 
     return rna_molecules
 
@@ -83,9 +88,12 @@ def get_rna_molecules(rna_raw_data, K, r):
         rna_molecules[group] = {}
         for fname in tqdm(rna_raw_data[group]):
             molecule = rna.RNA(
-                group, rna_raw_data[group][fname]['primary_structure'],
-                rna_raw_data[group][fname]['secondary_structure'], 'wobble',
-                K, r
+                group,
+                rna_raw_data[group][fname]['primary_structure'],
+                rna_raw_data[group][fname]['secondary_structure'],
+                'wobble',
+                K,
+                r,
             )
             molecule.evaluate_local_ambiguities()
             molecule.label_locations_using_secondary_structures()
@@ -109,7 +117,11 @@ def get_markov_shuffles(rna_molecules, parallel=True):
             markov_shuffles[group][fname] = {}
             molecule = rna_molecules[group][fname]
             shuffles = rna.get_markov_shuffles(
-                molecule.primary_structure, molecule.case, molecule.K, molecule.r, parallel
+                molecule.primary_structure,
+                molecule.case,
+                molecule.K,
+                molecule.r,
+                parallel,
             )
             flag = True
             for key in ['comparative', 'mfe']:
@@ -133,9 +145,7 @@ def get_essential_data(rna_molecules, markov_shuffles):
         essential_data[group] = {}
         for fname in tqdm(rna_molecules[group]):
             molecule = rna_molecules[group][fname]
-            results = {
-                'length': len(molecule.primary_structure)
-            }
+            results = {'length': len(molecule.primary_structure)}
             flag = markov_shuffles[group][fname]['flag']
             for key in ['comparative', 'mfe']:
                 for index in ['T-S', 'D-S']:
@@ -146,11 +156,9 @@ def get_essential_data(rna_molecules, markov_shuffles):
                     results[
                         'ambiguity_index_{}_{}'.format(key, index)
                     ] = ambiguity_index
-                    results[
-                        'alpha_index_{}_{}'.format(key, index)
-                    ] = markov_shuffles[group][fname][
-                        'alpha_index_{}_{}'.format(key, index)
-                    ]
+                    results['alpha_index_{}_{}'.format(key, index)] = markov_shuffles[
+                        group
+                    ][fname]['alpha_index_{}_{}'.format(key, index)]
 
             if flag:
                 essential_data[group][fname] = results
