@@ -17,3 +17,4 @@ dependencies:
     - sklearn
     - ushuffle
     - pyqt5
+    - joblib
