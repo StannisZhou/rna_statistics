@@ -21,16 +21,23 @@ SHORTEST_LOOP = 3
 
 class RNA(object):
     def __init__(
-        self, group, primary_structure, secondary_structure_comparative, case, K, r
+        self,
+        group,
+        primary_structure,
+        n_pseudoknots,
+        secondary_structure_comparative,
+        secondary_structure_mfe,
+        case,
+        K,
+        r,
     ):
         assert group in RNA_GROUPS
         assert case in ['wc_only', 'wobble']
         self.group = group
         self.primary_structure = primary_structure
-        self.secondary_structure = {
-            'comparative': secondary_structure_comparative,
-            'mfe': vienna_rnafold(primary_structure),
-        }
+        self.n_pseudoknots = n_pseudoknots
+        self.secondary_structure = secondary_structure_comparative
+        self.secondary_structure.update(secondary_structure_mfe)
         self.case = case
         self.K = K
         self.r = r
@@ -46,7 +53,7 @@ class RNA(object):
         n_paired_nucleotides = {}
         masks = {'single': {}, 'double': {}, 'transitional': {}}
         N = len(self.primary_structure)
-        for key in ['comparative', 'mfe']:
+        for key in self.secondary_structure.keys():
             paired_indicator[key] = (self.secondary_structure[key] > -1).astype(int)
             n_paired_nucleotides[key] = np.zeros(N - r + 1)
             for ii in range(N - r + 1):
@@ -70,7 +77,7 @@ class RNA(object):
     def get_mean_ambiguity(
         self, key, region, local_ambiguities_list, exclude_zero=False
     ):
-        assert key in ['comparative', 'mfe']
+        assert key in self.secondary_structure.keys()
         assert region in ['single', 'double', 'transitional']
         assert hasattr(self, 'masks')
         assert local_ambiguities_list.ndim == 2
@@ -92,7 +99,7 @@ class RNA(object):
         return mean_ambiguities
 
     def get_ambiguity_index(self, key, index):
-        assert key in ['comparative', 'mfe']
+        assert key in self.secondary_structure.keys()
         assert index in ['T-S', 'D-S']
         local_ambiguities_list = self.local_ambiguities.reshape((1, -1))
         if index == 'T-S':
@@ -107,7 +114,7 @@ class RNA(object):
         return ambiguity_index[0]
 
     def get_alpha_index(self, key, index, shuffles=None):
-        assert key in ['comparative', 'mfe']
+        assert key in self.secondary_structure.keys()
         assert index in ['T-S', 'D-S']
         ambiguity_index = self.get_ambiguity_index(key, index)
         if shuffles:
@@ -160,37 +167,33 @@ def get_local_ambiguities(primary_structure, r, case):
     return local_ambiguities
 
 
-def vienna_rnafold(primary_structure):
-    """vienna_rnafold
-
-    Wrapper function for the RNAfold program in the Vienna RNA package. Use the
-    default settings to fold the rna sequence.
-
-    Parameters
-    ----------
-
-    primary_structure : list
-        primary_structure is a list of all nucleotides.
-
-    Returns
-    -------
-
-    secondary_structure : np array
-        -1 if unpaired, otherwise nonnegative and indicates the index of the
-        pairing partner
-
-    """
+def vienna_rna_wrapper(primary_structure, command=['RNAfold', '--noPS']):
     primary_sequence = ''.join(primary_structure)
-    rna_fold = subprocess.Popen(
-        ['RNAfold', '--noPS'], stdin=subprocess.PIPE, stdout=subprocess.PIPE
-    )
+    rna_fold = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     rna_fold_output = rna_fold.communicate(primary_sequence.encode('utf-8'))[0]
-    secondary_structure_dot_bracket = rna_fold_output[
-        len(primary_sequence) + 1 : 2 * len(primary_sequence) + 1
-    ]
-    secondary_structure_dot_bracket = secondary_structure_dot_bracket.decode('utf-8')
-    secondary_structure = _parse_dot_bracket(secondary_structure_dot_bracket)
+    if len(rna_fold_output) > len(primary_sequence):
+        secondary_structure_dot_bracket = rna_fold_output[
+            len(primary_sequence) + 1 : 2 * len(primary_sequence) + 1
+        ]
+        secondary_structure_dot_bracket = secondary_structure_dot_bracket.decode(
+            'utf-8'
+        )
+        secondary_structure = _parse_dot_bracket(secondary_structure_dot_bracket)
+    else:
+        print('Error encountered while doing RNAPKplex. Skipping...')
+        secondary_structure = None
+
     return secondary_structure
+
+
+def get_vienna_rna_secondary_structures(group, molecule, rna_raw_data):
+    print('Working on Group {}, molecule {}'.format(group, molecule))
+    primary_structure = rna_raw_data[group][molecule]['primary_structure']
+    rnafold_secondary_structure = vienna_rna_wrapper(
+        primary_structure, ['RNAfold', '--noPS']
+    )
+    rnapkplex_secondary_structure = vienna_rna_wrapper(primary_structure, ['RNAPKplex'])
+    return group, molecule, rnafold_secondary_structure, rnapkplex_secondary_structure
 
 
 def _parse_dot_bracket(secondary_structure_dot_bracket):

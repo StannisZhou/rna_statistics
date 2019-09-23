@@ -1,13 +1,32 @@
+import multiprocessing as mp
 import os
 import re
+import subprocess
 import sys
 
 import numpy as np
 
 import rna
+from joblib import Parallel, delayed
 from tqdm import tqdm
 
 ALPHABET = ['A', 'G', 'C', 'U']
+RNA_ANALYSER_PATH = os.path.expanduser('~/RNAAnalyser/Analyser')
+DATA_FOLDER = 'data'
+DATA_WITHOUT_PSEUDOKNOTS_FOLDER = 'data_without_pseudoknots'
+
+
+def get_n_pseudoknots(fname):
+    output = str(subprocess.check_output([RNA_ANALYSER_PATH, '-analyse', fname]))
+    output_lines = output.split('\\n')
+    for line in output_lines:
+        characters = line.split(' ')
+        if len(characters) >= 3:
+            if characters[0] == 'Pseudoknot' and characters[1] == 'total':
+                n_pseudoknots = int(characters[2])
+                break
+
+    return n_pseudoknots
 
 
 def parse_bpseq(fname):
@@ -83,17 +102,51 @@ def process_raw_data(data_folder):
 
 
 def get_rna_molecules(rna_raw_data, K, r):
+    # Generate all MFE secondary structures
+    secondary_structure_mfe_outputs = Parallel(n_jobs=mp.cpu_count())(
+        delayed(rna.get_vienna_rna_secondary_structures)(group, molecule, rna_raw_data)
+        for group in rna_raw_data
+        for molecule in rna_raw_data[group]
+    )
+    secondary_structure_mfe = {group: {} for group in rna_raw_data}
+    for output in secondary_structure_mfe_outputs:
+        secondary_structure_mfe[output[0]][output[1]] = {}
+        secondary_structure_mfe[output[0]][output[1]]['mfe'] = output[2]
+        if output[3] is not None:
+            secondary_structure_mfe[output[0]][output[1]][
+                'mfe_with_pseudoknots'
+            ] = output[3]
+
+    # Construct RNA molecules
     rna_molecules = {}
     for group in rna_raw_data:
         rna_molecules[group] = {}
         for fname in tqdm(rna_raw_data[group]):
+            n_pseudoknots = get_n_pseudoknots(os.path.join(DATA_FOLDER, group, fname))
+            without_pseudoknots_fname = os.path.join(
+                DATA_WITHOUT_PSEUDOKNOTS_FOLDER, group, fname
+            )
+            secondary_structure_comparative = {
+                'comparative': rna_raw_data[group][fname]['secondary_structure']
+            }
+            if os.path.exists(without_pseudoknots_fname):
+                assert get_n_pseudoknots(without_pseudoknots_fname) == 0
+                _, _, secondary_structure_without_pseudoknots = parse_bpseq(
+                    without_pseudoknots_fname
+                )
+                secondary_structure_comparative[
+                    'comparative_without_pseudoknots'
+                ] = secondary_structure_without_pseudoknots
+
             molecule = rna.RNA(
-                group,
-                rna_raw_data[group][fname]['primary_structure'],
-                rna_raw_data[group][fname]['secondary_structure'],
-                'wobble',
-                K,
-                r,
+                group=group,
+                primary_structure=rna_raw_data[group][fname]['primary_structure'],
+                n_pseudoknots=n_pseudoknots,
+                secondary_structure_comparative=secondary_structure_comparative,
+                secondary_structure_mfe=secondary_structure_mfe[group][fname],
+                case='wobble',
+                K=K,
+                r=r,
             )
             molecule.evaluate_local_ambiguities()
             molecule.label_locations_using_secondary_structures()
