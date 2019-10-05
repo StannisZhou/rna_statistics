@@ -190,7 +190,7 @@ def get_markov_shuffles(rna_molecules, parallel=True):
                 parallel,
             )
             flag = True
-            for key in ['comparative', 'mfe']:
+            for key in molecule.secondary_structure.keys():
                 for index in ['T-S', 'D-S']:
                     alpha_index = molecule.get_alpha_index(key, index, shuffles)
                     if np.isnan(alpha_index):
@@ -213,7 +213,7 @@ def get_essential_data(rna_molecules, markov_shuffles):
             molecule = rna_molecules[group][fname]
             results = {'length': len(molecule.primary_structure)}
             flag = markov_shuffles[group][fname]['flag']
-            for key in ['comparative', 'mfe']:
+            for key in molecule.secondary_structure.keys():
                 for index in ['T-S', 'D-S']:
                     if (
                         key == 'comparative'
