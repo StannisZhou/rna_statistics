@@ -29,6 +29,19 @@ def get_n_pseudoknots(fname):
     return n_pseudoknots
 
 
+def get_n_stems(fname):
+    output = str(subprocess.check_output([RNA_ANALYSER_PATH, '-analyse', fname]))
+    output_lines = output.split('\\n')
+    for line in output_lines:
+        characters = line.split(' ')
+        if len(characters) >= 3:
+            if characters[0] == 'Stem' and characters[1] == 'total':
+                n_stems = int(characters[2])
+                break
+
+    return n_stems
+
+
 def parse_bpseq(fname):
     with open(fname) as f:
         s = f.read()
@@ -202,16 +215,40 @@ def get_essential_data(rna_molecules, markov_shuffles):
             flag = markov_shuffles[group][fname]['flag']
             for key in ['comparative', 'mfe']:
                 for index in ['T-S', 'D-S']:
-                    ambiguity_index = molecule.get_ambiguity_index(key, index)
+                    if (
+                        key == 'comparative'
+                        and 'comparative_without_pseudoknots'
+                        in molecule.secondary_structure
+                    ):
+                        ambiguity_index = molecule.get_ambiguity_index(
+                            'comparative_without_pseudoknots', index
+                        )
+                    else:
+                        ambiguity_index = molecule.get_ambiguity_index(key, index)
+
                     if np.isnan(ambiguity_index):
                         flag = False
 
                     results[
                         'ambiguity_index_{}_{}'.format(key, index)
                     ] = ambiguity_index
-                    results['alpha_index_{}_{}'.format(key, index)] = markov_shuffles[
-                        group
-                    ][fname]['alpha_index_{}_{}'.format(key, index)]
+                    if key == 'comparative':
+                        results[
+                            'alpha_index_{}_{}'.format(key, index)
+                        ] = markov_shuffles[group][fname].get(
+                            'alpha_index_comparative_without_pseudoknots_{}'.format(
+                                index
+                            ),
+                            markov_shuffles[group][fname][
+                                'alpha_index_{}_{}'.format(key, index)
+                            ],
+                        )
+                    else:
+                        results[
+                            'alpha_index_{}_{}'.format(key, index)
+                        ] = markov_shuffles[group][fname][
+                            'alpha_index_{}_{}'.format(key, index)
+                        ]
 
             if flag:
                 essential_data[group][fname] = results
