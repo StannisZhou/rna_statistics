@@ -24,6 +24,8 @@ streamlit run main.py
 ```
 to reproduce all the results using cached results in the `intermediate` folder. This would open up a browser session and interactively generate all the supplementary results.
 
+A pre-generated report containing all the results is also available at `report/index.html`.
+
 # Regenerate all the results from scratch
 
 To facilitate the exploration of the results, we included cached results in the `intermediate` folder. To regenerate all the results from scratch, a few additional external dependicies are needed:
