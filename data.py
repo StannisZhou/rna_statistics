@@ -205,18 +205,22 @@ def get_markov_shuffles(rna_molecules, parallel=True):
     return markov_shuffles
 
 
-def get_essential_data(rna_molecules, markov_shuffles):
+def get_essential_data(rna_molecules, markov_shuffles, use_pseudoknot_free=False):
     essential_data = {}
     for group in rna_molecules:
         essential_data[group] = {}
         for fname in tqdm(rna_molecules[group]):
             molecule = rna_molecules[group][fname]
-            results = {'length': len(molecule.primary_structure)}
+            results = {
+                'length': len(molecule.primary_structure),
+                'n_pseudoknots': molecule.n_pseudoknots,
+            }
             flag = markov_shuffles[group][fname]['flag']
             for key in molecule.secondary_structure.keys():
                 for index in ['T-S', 'D-S']:
                     if (
-                        key == 'comparative'
+                        use_pseudoknot_free
+                        and key == 'comparative'
                         and 'comparative_without_pseudoknots'
                         in molecule.secondary_structure
                     ):
@@ -232,7 +236,7 @@ def get_essential_data(rna_molecules, markov_shuffles):
                     results[
                         'ambiguity_index_{}_{}'.format(key, index)
                     ] = ambiguity_index
-                    if key == 'comparative':
+                    if use_pseudoknot_free and key == 'comparative':
                         results[
                             'alpha_index_{}_{}'.format(key, index)
                         ] = markov_shuffles[group][fname].get(
