@@ -18,3 +18,4 @@ dependencies:
     - ushuffle
     - pyqt5
     - joblib
+    - streamlit==0.47.4
