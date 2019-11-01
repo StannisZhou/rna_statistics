@@ -52,12 +52,12 @@ def parse_bpseq(fname):
     sys.stderr.flush()
     primary_sequence = []
     secondary_structure = []
-    header = []
     for ii in range(len(s)):
         if s[ii].startswith('1'):
             startingpoint = ii
             break
 
+    header = s[:startingpoint]
     assert s[startingpoint][0] == '1', s[startingpoint]
 
     for nucleotide in s[startingpoint:]:
