@@ -77,8 +77,10 @@ for use_pseudoknot_free in [False, True]:
         essential_data_by_family_for_intron_subclasses = results.get_essential_data_by_family_for_intron_subclasses(
             essential_data, raw_data
         )
-        st.header('Results with Original Comparative Structures on Intron Subclasses')
-        st.subheader('Data Summary Table for Intron Subclasses')
+        st.header(
+            'Results with Original Comparative Structures for Different Unbound Subgroups'
+        )
+        st.subheader('Data Summary Table for Different Unbound Subgroups')
         data_summary_table = results.generate_data_summary_table(
             essential_data_by_family_for_intron_subclasses
         )
