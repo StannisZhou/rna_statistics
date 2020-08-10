@@ -1,6 +1,6 @@
 # Introduction
 
-This repository contains the code to reproduce the experimental results in the paper "Base-pair Ambiguity and the Kinetics of RNA Folding".
+This repository contains the code to reproduce the experimental results in the paper ["Base-pair Ambiguity and the Kinetics of RNA Folding"](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-3303-6).
 
 # Setting up the environment
 
